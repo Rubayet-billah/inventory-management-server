@@ -47,6 +47,12 @@ async function run() {
             const products = await productsCollection.find(query).toArray();
             res.send(products);
         })
+        // get products by category id
+        app.get('/products/:categoryId', async (req, res) => {
+            const query = { categoryId: req.params.categoryId };
+            const products = await productsCollection.find(query).toArray();
+            res.send(products)
+        })
         app.get('/products/:id', async (req, res) => {
             const query = { _id: ObjectId(req.params.id) };
             const product = await productsCollection.findOne(query);
