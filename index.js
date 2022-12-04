@@ -29,6 +29,12 @@ async function run() {
             const categories = await categoriesCollection.find(query).toArray();
             res.send(categories)
         })
+        // get specific category by id
+        app.get('/categories/:id', async (req, res) => {
+            const query = { _id: ObjectId(req.params.id) };
+            const category = await categoriesCollection.findOne(query);
+            res.send(category)
+        })
         // add categories to database
         app.post('/categories', async (req, res) => {
             const category = req.body;
@@ -39,6 +45,25 @@ async function run() {
             }
             const result = await categoriesCollection.insertOne(category);
             res.send(result);
+        })
+        // update category from database
+        app.patch('/categories/:id', async (req, res) => {
+            const categoryId = req.params.id;
+            const filter = { _id: ObjectId(categoryId) };
+            const updatedDoc = {
+                $set: req.body
+            }
+            const updatedResult = await categoriesCollection.updateOne(filter, updatedDoc);
+            res.send(updatedResult)
+        })
+        // delete category and all products in that category
+        app.delete('/categories/:id', async (req, res) => {
+            const categoryId = req.params.id;
+            const caategoryQuery = { _id: ObjectId(categoryId) }
+            const productsQuery = { categoryId: categoryId }
+            const deleteProducts = await productsCollection.deleteMany(productsQuery);
+            const deleteCategory = await categoriesCollection.deleteOne(caategoryQuery);
+            res.send(deleteCategory)
         })
 
         // get product from database
